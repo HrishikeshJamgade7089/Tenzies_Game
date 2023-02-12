@@ -1,21 +1,61 @@
-import logo from './logo.svg';
+import Die from './components/Die';
 import './App.css';
+import { useState } from 'react';
+import Header from './components/Header';
 
 function App() {
+
+  ;
+
+  // create a state for storing the dice data;
+  const [dice, setDice] = useState(allNewDice());
+
+  function rollDice(){
+    setDice(allNewDice());
+  }
+
+  function allNewDice(){
+      let allDiceNo = [];
+      for(let i=0; i<10; i++){
+        allDiceNo.push({value:(Math.floor(Math.random() * 6) + 1), isHeld:true, id:Math.random().toString(36).substr(2, 9)});
+      }
+      return allDiceNo;
+  }
+  
+  function holdDice(id){
+    console.log(id);
+  }
+  
+
+
+  const diceElements = dice.map(die=><Die value={die.value} key={die.id} isHeld={die.isHeld}  holdDice={()=>holdDice(die.id)}/>)
+
   return (
+    
     <div className='container'>
       
       <div className="sub_Container">
         <div className="sub_Container_for_flex">
-            <div className="heading_line">
-                <h3>Tenzies</h3>
-                <p>Roll until all dice are the same. Click each die to freeze it at its current value between rolls.</p>
-            </div>
+
+
+            <Header/>
+
+
+
             <div className="tiles">
-                <p>tiles section</p>
+
+
+
+                {diceElements}
+
+
+
             </div>
-            <div className="button">
-                <p>button section</p>
+
+            
+
+            <div className="button" >
+                <p className='button_part' onClick={rollDice}>Press</p>
             </div>
         </div>
         
