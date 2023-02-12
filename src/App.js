@@ -1,30 +1,75 @@
 import Die from './components/Die';
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './components/Header';
+// import { confettiDefaults } from 'react-confetti/dist/types/Confetti';
+import Confetti from 'react-confetti'
 
 function App() {
 
-  ;
+  //Create a tenzies state to check is the user has won or not
+  const [tenzies, setTenzies] = useState(false);
 
   // create a state for storing the dice data;
   const [dice, setDice] = useState(allNewDice());
 
-  function rollDice(){
-    setDice(allNewDice());
+
+  useEffect(() => {
+      let prev = dice[0];
+      let check = true;
+      for(let i=0; i<10; i++){
+        if(!prev.isHeld || !dice[i].isHeld){
+          check = false;
+        }
+        if(prev.value != dice[i].value){
+          check = false;
+        }
+        
+      }
+
+      setTenzies(check);
+  }, [dice])
+  
+
+  function generateNewDie(){
+    return {
+      value:(Math.floor(Math.random() * 6) + 1), 
+      isHeld:false, 
+      id:Math.random().toString(36).substr(2, 9)
+    }
   }
 
   function allNewDice(){
       let allDiceNo = [];
       for(let i=0; i<10; i++){
-        allDiceNo.push({value:(Math.floor(Math.random() * 6) + 1), isHeld:true, id:Math.random().toString(36).substr(2, 9)});
+        allDiceNo.push(generateNewDie());
       }
       return allDiceNo;
   }
-  
-  function holdDice(id){
-    console.log(id);
+
+  function rollDice(){
+    // setDice(allNewDice());
+    if(tenzies){
+      setDice(allNewDice());
+      setTenzies(false);
+    }
+    else{
+      setDice(prevDice=>prevDice.map(die=>{
+        return die.isHeld ? die:generateNewDie();
+      }))
+    }
+    
   }
+
+  function holdDice(id){
+    setDice(prevDice=>prevDice.map(die=>{
+      return die.id===id ? {...die, isHeld:!die.isHeld}:die;
+    }))
+  }
+
+  // function holdDice(id){
+  //   console.log(id);
+  // }
   
 
 
@@ -35,6 +80,13 @@ function App() {
     <div className='container'>
       
       <div className="sub_Container">
+
+      
+
+
+      {tenzies && <Confetti
+      width={500}
+      height={500} />}
         <div className="sub_Container_for_flex">
 
 
@@ -55,7 +107,7 @@ function App() {
             
 
             <div className="button" >
-                <p className='button_part' onClick={rollDice}>Press</p>
+                <p className='button_part' onClick={rollDice}>{tenzies?'New Game':'Roll'}</p>
             </div>
         </div>
         
